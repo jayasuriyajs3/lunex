@@ -1,0 +1,1127 @@
+{
+  "info": {
+    "name": "LUNEX API Collection",
+    "_postman_id": "lunex-api-2026",
+    "description": "Complete API collection for LUNEX — Smart Laundry & Utility Management System\n\nMotto: \"Book Smart. Wash Easy. Live Better.\"\n\nBase URL: http://localhost:5000/api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "wardenToken",
+      "value": ""
+    },
+    {
+      "key": "userToken",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "bookingId",
+      "value": ""
+    },
+    {
+      "key": "sessionId",
+      "value": ""
+    },
+    {
+      "key": "machineId",
+      "value": "WM-001"
+    },
+    {
+      "key": "issueId",
+      "value": ""
+    },
+    {
+      "key": "notificationId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "🏠 Health Check",
+      "item": [
+        {
+          "name": "API Root",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/../",
+            "header": []
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health",
+            "header": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Register New User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.accessToken) {",
+                  "    pm.collectionVariables.set('userToken', json.data.accessToken);",
+                  "}",
+                  "if (json.data && json.data.user) {",
+                  "    pm.collectionVariables.set('userId', json.data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Hosteller\",\n  \"email\": \"newhosteller@test.com\",\n  \"phone\": \"9876543210\",\n  \"password\": \"test1234\",\n  \"roomNumber\": \"201\",\n  \"hostelBlock\": \"B\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login — Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.accessToken) {",
+                  "    pm.collectionVariables.set('adminToken', json.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@lunex.com\",\n  \"password\": \"admin123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login — Warden",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.accessToken) {",
+                  "    pm.collectionVariables.set('wardenToken', json.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"warden@lunex.com\",\n  \"password\": \"warden123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login — User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.accessToken) {",
+                  "    pm.collectionVariables.set('userToken', json.data.accessToken);",
+                  "}",
+                  "if (json.data && json.data.user) {",
+                  "    pm.collectionVariables.set('userId', json.data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@lunex.com\",\n  \"password\": \"user1234\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/me",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Check Account Status",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/status",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/auth/profile",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"9876543211\",\n  \"roomNumber\": \"102\",\n  \"hostelBlock\": \"A\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/auth/change-password",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"user1234\",\n  \"newPassword\": \"newpass123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/refresh-token",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"paste_refresh_token_here\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/logout",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔧 Machines",
+      "item": [
+        {
+          "name": "Get All Machines",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/machines",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Machine by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/machines/{{machineId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Create Machine (Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/machines",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"machineId\": \"WM-004\",\n  \"name\": \"Washer 4\",\n  \"location\": \"Block C - Ground Floor\",\n  \"esp32Ip\": \"192.168.1.104\",\n  \"relayPin\": 26\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Machine (Admin)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/machines/WM-004",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Washer 4 Updated\",\n  \"location\": \"Block C - First Floor\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Machine Status (Warden/Admin)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/machines/{{machineId}}/status",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{wardenToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"maintenance\",\n  \"maintenanceNote\": \"Belt replacement needed\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Set Machine Available (Warden/Admin)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/machines/{{machineId}}/status",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{wardenToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"available\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Machine (Admin)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/machines/WM-004",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "ESP32 Heartbeat",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/machines/{{machineId}}/heartbeat",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📅 Bookings",
+      "item": [
+        {
+          "name": "Create Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.booking) {",
+                  "    pm.collectionVariables.set('bookingId', json.data.booking._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/bookings",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"machineId\": \"WM-001\",\n  \"startTime\": \"2026-02-24T10:00:00.000Z\",\n  \"durationMinutes\": 30\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Bookings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/bookings/my?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "my"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Booking by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/bookings/{{bookingId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Available Slots",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/bookings/slots/WM-001/2026-02-24",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/bookings/{{bookingId}}/cancel",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Schedule changed\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Bookings (Warden/Admin)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/bookings/all?page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "all"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "50" }
+              ]
+            },
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{wardenToken}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚡ Sessions",
+      "item": [
+        {
+          "name": "Start Session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.session) {",
+                  "    pm.collectionVariables.set('sessionId', json.data.session._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/sessions/start",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": \"{{bookingId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Active Session",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/sessions/active",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Extend Session (+5 min)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/sessions/{{sessionId}}/extend",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "End Session",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/sessions/{{sessionId}}/end",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Pause Session (Warden/Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/sessions/{{sessionId}}/pause",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{wardenToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Resume Session (Warden/Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/sessions/{{sessionId}}/resume",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{wardenToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Force Stop Session (Warden/Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/sessions/{{sessionId}}/force-stop",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{wardenToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Session History",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/sessions/history",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get All Sessions (Warden/Admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/sessions/all",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{wardenToken}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏷️ RFID",
+      "item": [
+        {
+          "name": "RFID Scan (from ESP32)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/rfid/scan",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rfidUID\": \"USER0001\",\n  \"machineId\": \"WM-001\"\n}"
+            }
+          }
+        },
+        {
+          "name": "RFID Scan — Master Card",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/rfid/scan",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rfidUID\": \"MASTER0001\",\n  \"machineId\": \"WM-001\"\n}"
+            }
+          }
+        },
+        {
+          "name": "RFID Scan — Unknown Card",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/rfid/scan",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rfidUID\": \"UNKNOWN99\",\n  \"machineId\": \"WM-001\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Validate RFID (Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/rfid/validate",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rfidUID\": \"USER0001\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚨 Issues",
+      "item": [
+        {
+          "name": "Report Issue",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.issue) {",
+                  "    pm.collectionVariables.set('issueId', json.data.issue._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/issues",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"machineId\": \"WM-001\",\n  \"issueType\": \"water\",\n  \"description\": \"No water supply to the machine\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Issues",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/issues/my",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get All Issues (Warden/Admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/issues/all",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{wardenToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Verify Issue (Warden)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/issues/{{issueId}}/verify",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{wardenToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Resolve Issue (Warden)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/issues/{{issueId}}/resolve",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{wardenToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resolutionNote\": \"Water supply restored\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Dismiss Issue (Warden)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/issues/{{issueId}}/dismiss",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{wardenToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resolutionNote\": \"Issue could not be reproduced\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Trigger Priority Rebook (Warden)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/issues/{{issueId}}/priority-rebook",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{wardenToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Pending Priority Rebooks",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/issues/priority-rebook/pending",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Respond to Priority Rebook (Accept)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/issues/priority-rebook/REBOOK_ID_HERE/respond",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"accept\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔔 Notifications",
+      "item": [
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/notifications?page=1&limit=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "30" }
+              ]
+            },
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Unread Count",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/notifications/unread-count",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/notifications/{{notificationId}}/read",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/notifications/read-all",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Delete Notification",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/notifications/{{notificationId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "👨‍💼 Admin",
+      "item": [
+        {
+          "name": "📋 User Management",
+          "item": [
+            {
+              "name": "Get All Users",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/admin/users?page=1&limit=50",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "users"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "50" }
+                  ]
+                },
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ]
+              }
+            },
+            {
+              "name": "Get Pending Registrations",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/admin/users/pending",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ]
+              }
+            },
+            {
+              "name": "Approve User",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/admin/users/approve",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Reject User",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/admin/users/reject",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Block User",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/admin/users/block",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Unblock User",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/admin/users/unblock",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Assign RFID",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/admin/users/assign-rfid",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"rfidUID\": \"NEWRFID01\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Revoke RFID",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/admin/users/revoke-rfid",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Change User Role",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/admin/users/change-role",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"role\": \"warden\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Reset User Password",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/admin/users/reset-password",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"newPassword\": \"resetpass123\"\n}"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "⚙️ System Config",
+          "item": [
+            {
+              "name": "Get All Configs",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/admin/config",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ]
+              }
+            },
+            {
+              "name": "Set Config",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/admin/config",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"key\": \"max_bookings_per_day\",\n  \"value\": 5,\n  \"description\": \"Maximum bookings per user per day\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Config",
+              "request": {
+                "method": "DELETE",
+                "url": "{{baseUrl}}/admin/config/max_bookings_per_day",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "🚨 Emergency",
+          "item": [
+            {
+              "name": "Emergency Shutdown",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/admin/emergency/shutdown",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ]
+              }
+            },
+            {
+              "name": "Emergency Reset",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/admin/emergency/reset",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "📊 Analytics",
+          "item": [
+            {
+              "name": "Dashboard Analytics",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/admin/analytics/dashboard",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ]
+              }
+            },
+            {
+              "name": "Machine Utilization",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/admin/analytics/machine-utilization",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ]
+              }
+            },
+            {
+              "name": "No-Show Statistics",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/admin/analytics/no-shows?days=30",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "analytics", "no-shows"],
+                  "query": [
+                    { "key": "days", "value": "30" }
+                  ]
+                },
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ]
+              }
+            },
+            {
+              "name": "Peak Usage Analysis",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/admin/analytics/peak-usage?days=30",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "analytics", "peak-usage"],
+                  "query": [
+                    { "key": "days", "value": "30" }
+                  ]
+                },
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
