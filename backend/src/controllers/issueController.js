@@ -6,6 +6,7 @@ const Session = require('../models/Session');
 const Booking = require('../models/Booking');
 const Machine = require('../models/Machine');
 const PriorityRebook = require('../models/PriorityRebook');
+const User = require('../models/User');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const sendResponse = require('../utils/sendResponse');
@@ -285,10 +286,42 @@ const triggerPriorityRebook = asyncHandler(async (req, res) => {
     throw new AppError('No available slots found.', 400);
   }
 
+  let originalBookingId = issue.booking;
+
+  if (!originalBookingId && issue.session) {
+    const session = await Session.findById(issue.session).select('booking');
+    if (session?.booking) {
+      originalBookingId = session.booking;
+    }
+  }
+
+  if (!originalBookingId) {
+    const fallbackBooking = await Booking.findOne({
+      user: issue.reportedBy,
+      machine: issue.machine._id,
+      status: {
+        $in: [
+          BOOKING_STATUS.ACTIVE,
+          BOOKING_STATUS.CONFIRMED,
+          BOOKING_STATUS.COMPLETED,
+          BOOKING_STATUS.INTERRUPTED,
+        ],
+      },
+    }).sort({ startTime: -1, createdAt: -1 });
+
+    if (fallbackBooking) {
+      originalBookingId = fallbackBooking._id;
+    }
+  }
+
+  if (!originalBookingId) {
+    throw new AppError('Cannot offer priority rebook because no related booking was found.', 400);
+  }
+
   // Create priority rebook offer
   const priorityRebook = await PriorityRebook.create({
     user: issue.reportedBy,
-    originalBooking: issue.booking,
+    originalBooking: originalBookingId,
     issue: issue._id,
     offeredSlot: {
       machine: bestMachine._id,

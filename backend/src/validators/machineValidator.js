@@ -26,7 +26,7 @@ const updateMachineStatusSchema = Joi.object({
       'any.only': `Status must be one of: ${Object.values(MACHINE_STATUS).join(', ')}`,
       'any.required': 'Status is required',
     }),
-  maintenanceNote: Joi.string().trim().max(500).optional(),
+  maintenanceNote: Joi.string().trim().max(500).allow('').optional(),
 });
 
 const updateMachineSchema = Joi.object({
