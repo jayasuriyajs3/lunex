@@ -21,8 +21,8 @@ const { ROLES } = require('../config/constants');
 router.use(protect);
 
 // User routes
-router.post('/', authorize(ROLES.USER), validate(createBookingSchema), createBooking);
-router.get('/my', authorize(ROLES.USER), getMyBookings);
+router.post('/', authorize(ROLES.USER, ROLES.WARDEN, ROLES.ADMIN), validate(createBookingSchema), createBooking);
+router.get('/my', authorize(ROLES.USER, ROLES.WARDEN, ROLES.ADMIN), getMyBookings);
 router.get('/slots/:machineId/:date', getAvailableSlots);
 router.get('/all', authorize(ROLES.WARDEN, ROLES.ADMIN), getAllBookings);
 router.get('/:id', getBookingById);

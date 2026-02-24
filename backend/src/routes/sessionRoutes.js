@@ -23,10 +23,10 @@ router.use(protect);
 
 // User routes
 router.post('/start', authorize(ROLES.USER, ROLES.WARDEN, ROLES.ADMIN), startSession);
-router.get('/active', authorize(ROLES.USER), getActiveSession);
-router.post('/:id/extend', authorize(ROLES.USER), extendSession);
+router.get('/active', authorize(ROLES.USER, ROLES.WARDEN, ROLES.ADMIN), getActiveSession);
+router.post('/:id/extend', authorize(ROLES.USER, ROLES.WARDEN, ROLES.ADMIN), extendSession);
 router.post('/:id/end', endSession);
-router.get('/history', authorize(ROLES.USER), getSessionHistory);
+router.get('/history', authorize(ROLES.USER, ROLES.WARDEN, ROLES.ADMIN), getSessionHistory);
 
 // Warden + Admin routes
 router.post('/:id/pause', authorize(ROLES.WARDEN, ROLES.ADMIN), pauseSession);
