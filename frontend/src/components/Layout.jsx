@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { notificationAPI } from '../services/api';
 import {
@@ -31,21 +31,40 @@ const staffLinks = [
 export default function Layout() {
   const { user, logout, isStaff, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [staffMenuOpen, setStaffMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchUnread = async () => {
-      try {
-        const { data } = await notificationAPI.getUnreadCount();
-        setUnreadCount(data.data?.unreadCount ?? 0);
-      } catch { /* ignore */ }
-    };
-    fetchUnread();
-    const interval = setInterval(fetchUnread, 30000);
-    return () => clearInterval(interval);
+  const fetchUnread = useCallback(async () => {
+    try {
+      const { data } = await notificationAPI.getUnreadCount();
+      setUnreadCount(data.data?.unreadCount ?? 0);
+    } catch {
+      /* ignore */
+    }
   }, []);
+
+  useEffect(() => {
+    fetchUnread();
+  }, [fetchUnread, location.pathname]);
+
+  useEffect(() => {
+    const handleFocus = () => fetchUnread();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchUnread();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [fetchUnread]);
 
   const handleLogout = async () => {
     await logout();
