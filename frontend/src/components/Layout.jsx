@@ -89,7 +89,7 @@ export default function Layout() {
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto p-4 space-y-1">
             {userLinks.map(({ to, icon: Icon, label }) => (
-              <NavLink key={to} to={to} end={to === '/'} className={linkClasses}
+              <NavLink key={to} to={to} end className={linkClasses}
                 onClick={() => setSidebarOpen(false)}>
                 <Icon className="w-5 h-5 shrink-0" />
                 {label}
@@ -106,7 +106,7 @@ export default function Layout() {
                   </button>
                 </div>
                 {staffMenuOpen && visibleStaffLinks.map(({ to, icon: Icon, label }) => (
-                  <NavLink key={to} to={to} className={linkClasses}
+                  <NavLink key={to} to={to} end className={linkClasses}
                     onClick={() => setSidebarOpen(false)}>
                     <Icon className="w-5 h-5 shrink-0" />
                     {label}
