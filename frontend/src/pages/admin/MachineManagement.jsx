@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { machineAPI } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 import { Card, StatusBadge, PageHeader, Button, Spinner, EmptyState, Modal, Input, Select } from '../../components/UI';
 import { WashingMachine, Plus, Pencil, Trash2, MapPin, Wifi, WifiOff, Wrench } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -13,6 +14,7 @@ const statusOptions = [
 ];
 
 export default function MachineManagement() {
+  const { isAdmin } = useAuth();
   const [machines, setMachines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -93,11 +95,11 @@ export default function MachineManagement() {
   return (
     <div>
       <PageHeader title="Machine Management" subtitle={`${machines.length} machines`}
-        action={<Button onClick={openCreate}><Plus className="w-4 h-4" /> Add Machine</Button>} />
+        action={isAdmin ? <Button onClick={openCreate}><Plus className="w-4 h-4" /> Add Machine</Button> : null} />
 
       {machines.length === 0 ? (
         <EmptyState icon={WashingMachine} title="No machines" message="Add your first machine to get started."
-          action={<Button onClick={openCreate}>Add Machine</Button>} />
+          action={isAdmin ? <Button onClick={openCreate}>Add Machine</Button> : null} />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {machines.map((m) => (
@@ -132,9 +134,11 @@ export default function MachineManagement() {
               </div>
 
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" className="flex-1" onClick={() => openEdit(m)}>
-                  <Pencil className="w-3.5 h-3.5" /> Edit
-                </Button>
+                {isAdmin && (
+                  <Button size="sm" variant="outline" className="flex-1" onClick={() => openEdit(m)}>
+                    <Pencil className="w-3.5 h-3.5" /> Edit
+                  </Button>
+                )}
                 <Button size="sm" variant="outline" onClick={() => {
                   setStatusModal(m._id);
                   setNewStatus(m.status);
@@ -142,9 +146,11 @@ export default function MachineManagement() {
                 }}>
                   <Wrench className="w-3.5 h-3.5" />
                 </Button>
-                <Button size="sm" variant="danger" onClick={() => handleDelete(m._id)}>
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
+                {isAdmin && (
+                  <Button size="sm" variant="danger" onClick={() => handleDelete(m._id)}>
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                )}
               </div>
             </Card>
           ))}

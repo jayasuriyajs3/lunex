@@ -73,7 +73,7 @@ export default function App() {
         <Route path="admin/bookings" element={<ProtectedRoute staffOnly><AllBookings /></ProtectedRoute>} />
         <Route path="admin/sessions" element={<ProtectedRoute staffOnly><AllSessions /></ProtectedRoute>} />
         <Route path="admin/issues" element={<ProtectedRoute staffOnly><AllIssues /></ProtectedRoute>} />
-        <Route path="admin/machines" element={<ProtectedRoute adminOnly><MachineManagement /></ProtectedRoute>} />
+        <Route path="admin/machines" element={<ProtectedRoute staffOnly><MachineManagement /></ProtectedRoute>} />
         <Route path="admin/config" element={<ProtectedRoute adminOnly><SystemConfig /></ProtectedRoute>} />
       </Route>
 

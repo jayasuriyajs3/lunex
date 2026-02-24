@@ -24,7 +24,7 @@ const staffLinks = [
   { to: '/admin/bookings', icon: CalendarDays, label: 'All Bookings' },
   { to: '/admin/sessions', icon: History, label: 'All Sessions' },
   { to: '/admin/issues', icon: AlertTriangle, label: 'All Issues' },
-  { to: '/admin/machines', icon: WashingMachine, label: 'Manage Machines', adminOnly: true },
+  { to: '/admin/machines', icon: WashingMachine, label: 'Manage Machines' },
   { to: '/admin/config', icon: Settings, label: 'System Config', adminOnly: true },
 ];
 
