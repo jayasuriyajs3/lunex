@@ -14,7 +14,7 @@ const createMachineSchema = Joi.object({
   location: Joi.string().trim().required().messages({
     'any.required': 'Location is required',
   }),
-  esp32Ip: Joi.string().trim().optional(),
+  esp32Ip: Joi.string().trim().allow('').optional(),
   relayPin: Joi.number().integer().optional(),
 });
 
@@ -32,7 +32,7 @@ const updateMachineStatusSchema = Joi.object({
 const updateMachineSchema = Joi.object({
   name: Joi.string().trim().optional(),
   location: Joi.string().trim().optional(),
-  esp32Ip: Joi.string().trim().optional(),
+  esp32Ip: Joi.string().trim().allow('').optional(),
   relayPin: Joi.number().integer().optional(),
 });
 
