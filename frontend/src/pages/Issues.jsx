@@ -49,7 +49,7 @@ export default function Issues() {
 
   const handleRebookRespond = async (id, action) => {
     try {
-      await issueAPI.respondToRebook(id, { response: action });
+      await issueAPI.respondToRebook(id, { action });
       toast.success(action === 'accept' ? 'Rebook accepted!' : 'Rebook declined');
       load();
     } catch (err) {

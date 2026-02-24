@@ -44,7 +44,7 @@ export default function MachineManagement() {
 
   const openEdit = (m) => {
     setForm({ machineId: m.machineId, name: m.name, location: m.location, esp32Ip: m.esp32Ip || '', relayPin: m.relayPin || 0 });
-    setEditingId(m._id);
+    setEditingId(m.machineId);
     setShowForm(true);
   };
 
@@ -140,14 +140,14 @@ export default function MachineManagement() {
                   </Button>
                 )}
                 <Button size="sm" variant="outline" onClick={() => {
-                  setStatusModal(m._id);
+                  setStatusModal(m.machineId);
                   setNewStatus(m.status);
                   setMaintenanceNote(m.maintenanceNote || '');
                 }}>
                   <Wrench className="w-3.5 h-3.5" />
                 </Button>
                 {isAdmin && (
-                  <Button size="sm" variant="danger" onClick={() => handleDelete(m._id)}>
+                  <Button size="sm" variant="danger" onClick={() => handleDelete(m.machineId)}>
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
                 )}
