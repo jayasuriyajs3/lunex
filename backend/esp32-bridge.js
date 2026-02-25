@@ -30,6 +30,9 @@ const serialPort = new SerialPort({
   autoOpen: false 
 });
 
+// Buffer for incomplete lines
+let serialBuffer = '';
+
 // ===== EVENT: PORT OPENED =====
 serialPort.on('open', () => {
   console.log(`✅ Serial port opened on ${COM_PORT}`);
@@ -39,7 +42,30 @@ serialPort.on('open', () => {
 // ===== EVENT: DATA RECEIVED =====
 serialPort.on('data', async (data) => {
   try {
-    const message = data.toString().trim();
+    // Append new data to buffer
+    serialBuffer += data.toString();
+    
+    // Process all complete lines (ending with \n)
+    let lines = serialBuffer.split('\n');
+    
+    // Keep the last incomplete line in buffer
+    serialBuffer = lines.pop() || '';
+    
+    // Process each complete line
+    for (let message of lines) {
+      message = message.trim();
+      
+      // Process the complete message
+      await processMessage(message);
+    }
+  } catch (error) {
+    console.error(`❌ Unexpected error: ${error.message}`);
+  }
+});
+
+// ===== PROCESS COMPLETE MESSAGE =====
+async function processMessage(message) {
+  try {
     
     // Skip empty or debug messages
     if (!message || message.startsWith('=')) {
@@ -51,7 +77,7 @@ serialPort.on('data', async (data) => {
     try {
       json = JSON.parse(message);
     } catch (e) {
-      console.log(`⚠️  Non-JSON data: ${message}`);
+      console.log(`⚠️  Non-JSON data: ${message.substring(0, 50)}`);
       return;
     }
     
@@ -159,9 +185,9 @@ serialPort.on('data', async (data) => {
     }
     
   } catch (error) {
-    console.error(`❌ Unexpected error: ${error.message}`);
+    console.error(`❌ Unexpected error in message processing: ${error.message}`);
   }
-});
+}
 
 // ===== EVENT: PORT ERROR =====
 serialPort.on('error', (err) => {
