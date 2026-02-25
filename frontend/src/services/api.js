@@ -1,7 +1,21 @@
 import axios from 'axios';
 
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+
+  const isLocalHost =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+  return isLocalHost ? 'http://localhost:5000/api' : 'https://lunex-2.onrender.com/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -24,7 +38,7 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) throw new Error('No refresh token');
-        const { data } = await axios.post('/api/auth/refresh-token', { refreshToken });
+        const { data } = await axios.post(`${API_BASE_URL}/auth/refresh-token`, { refreshToken });
         localStorage.setItem('accessToken', data.data.accessToken);
         localStorage.setItem('refreshToken', data.data.refreshToken);
         originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
