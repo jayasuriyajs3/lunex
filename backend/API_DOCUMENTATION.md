@@ -55,6 +55,20 @@ cp .env.example .env
 npm run seed
 ```
 
+### Bootstrap / Repair Admin (Production-safe)
+
+Use this when production DB does not have a working admin user, or the admin is stuck in `pending`.
+
+```bash
+npm run bootstrap:admin -- --email admin@lunex.com --password "YourStrongPassword123!" --name "LUNEX Admin" --phone "9999999999"
+```
+
+This command will:
+- create the admin if it does not exist
+- force role to `admin`
+- force account status to `active`
+- optionally reset password when `--password` is provided
+
 This creates:
 - 1 Admin user
 - 1 Warden user

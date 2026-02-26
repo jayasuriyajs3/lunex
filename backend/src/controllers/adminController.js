@@ -256,12 +256,23 @@ const changeUserRole = asyncHandler(async (req, res) => {
     throw new AppError('User not found.', 404);
   }
 
+  if (!Object.values(ROLES).includes(role)) {
+    throw new AppError('Invalid role.', 400);
+  }
+
   // Don't allow changing own role
   if (userId === req.user._id.toString()) {
     throw new AppError('Cannot change your own role.', 400);
   }
 
   user.role = role;
+
+  if (user.accountStatus === ACCOUNT_STATUS.PENDING && (role === ROLES.ADMIN || role === ROLES.WARDEN)) {
+    user.accountStatus = ACCOUNT_STATUS.ACTIVE;
+    user.approvedBy = req.user._id;
+    user.approvedAt = new Date();
+  }
+
   await user.save();
 
   sendResponse(res, 200, true, `User role changed to ${role}.`, { user });
