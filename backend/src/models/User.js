@@ -44,9 +44,12 @@ const userSchema = new mongoose.Schema(
     },
     rfidUID: {
       type: String,
-      unique: true,
-      sparse: true,
-      default: null,
+      trim: true,
+      set: (value) => {
+        if (typeof value !== 'string') return undefined;
+        const normalized = value.trim();
+        return normalized.length ? normalized : undefined;
+      },
     },
     roomNumber: {
       type: String,
@@ -93,6 +96,16 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+  }
+);
+
+userSchema.index(
+  { rfidUID: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      rfidUID: { $type: 'string' },
+    },
   }
 );
 

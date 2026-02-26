@@ -17,6 +17,32 @@ const iconMap = {
   'emergency': AlertTriangle,
 };
 
+const getBookingTimeRange = (startTime, endTime) => {
+  if (!startTime || !endTime) return null;
+
+  const start = typeof startTime === 'string' ? parseISO(startTime) : new Date(startTime);
+  const end = typeof endTime === 'string' ? parseISO(endTime) : new Date(endTime);
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return null;
+  }
+
+  return `${format(start, 'h:mm:ss a')} to ${format(end, 'h:mm:ss a')}`;
+};
+
+const getNotificationMessage = (notification) => {
+  if (notification.type === 'booking-confirmed') {
+    const machineName = notification.data?.machineName;
+    const bookingRange = getBookingTimeRange(notification.data?.startTime, notification.data?.endTime);
+
+    if (machineName && bookingRange) {
+      return `Your slot on ${machineName} is booked from ${bookingRange}.`;
+    }
+  }
+
+  return notification.message;
+};
+
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +117,7 @@ export default function Notifications() {
                     <p className={`text-sm font-medium ${!n.isRead ? 'text-gray-900' : 'text-gray-700'}`}>
                       {n.title}
                     </p>
-                    <p className="text-sm text-gray-500 mt-0.5">{n.message}</p>
+                    <p className="text-sm text-gray-500 mt-0.5">{getNotificationMessage(n)}</p>
                     <p className="text-xs text-gray-400 mt-1">
                       {n.createdAt ? formatDistanceToNow(parseISO(n.createdAt), { addSuffix: true }) : ''}
                     </p>

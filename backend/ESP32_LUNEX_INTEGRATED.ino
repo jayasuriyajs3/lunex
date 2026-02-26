@@ -152,7 +152,7 @@ void sendHeartbeat() {
   doc["type"] = "heartbeat";
   doc["machineId"] = MACHINE_ID;
   doc["status"] = "online";
-  doc["relayStatus"] = digitalWrite(RELAY_PIN) == LOW ? "ON" : "OFF";
+  doc["relayStatus"] = digitalRead(RELAY_PIN) == LOW ? "ON" : "OFF";
   doc["timestamp"] = millis();
   
   String jsonString;
