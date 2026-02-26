@@ -3,7 +3,7 @@
 > **"Book Smart. Wash Easy. Live Better."**
 
 **Version:** 1.0.0  
-**Last Updated:** February 24, 2026
+**Last Updated:** February 25, 2026
 
 ---
 
@@ -44,7 +44,7 @@
 
 | Feature | Description |
 |---------|-------------|
-| **Slot Booking** | Users book 15–60 minute slots on available machines up to 7 days in advance |
+| **Slot Booking** | Users book 10–60 minute slots on available machines up to 7 days in advance |
 | **RFID Authentication** | Physical RFID cards scanned at ESP32-connected machines to start/end sessions |
 | **Live Session Tracking** | Real-time countdown timer, session extension (+5 min), early end |
 | **Issue Reporting** | Report water/power/machine faults; sessions auto-pause during issues |
@@ -701,7 +701,7 @@ frontend/
 │           ├── AllBookings.jsx       # All bookings (admin view)
 │           ├── AllSessions.jsx       # All sessions + pause/resume/force-stop
 │           ├── AllIssues.jsx         # Issues + verify/resolve/dismiss/rebook
-│           ├── MachineManagement.jsx # Machine CRUD + status management
+│           ├── MachineManagement.jsx # Staff status management + admin CRUD
 │           └── SystemConfig.jsx      # Key-value config management
 ```
 
@@ -738,7 +738,7 @@ frontend/
 | **AllBookings** | `/admin/bookings` | Warden, Admin | All bookings across all users, search & filter by status |
 | **AllSessions** | `/admin/sessions` | Warden, Admin | All sessions with pause/resume/force-stop controls for active ones |
 | **AllIssues** | `/admin/issues` | Warden, Admin | All issues with verify/resolve/dismiss actions and priority rebook offering |
-| **MachineManagement** | `/admin/machines` | Admin only | Full machine CRUD: add/edit/delete machines, update status with maintenance notes |
+| **MachineManagement** | `/admin/machines` | Warden, Admin | Update machine status (warden/admin). Full machine CRUD (add/edit/delete) for admin only. |
 | **SystemConfig** | `/admin/config` | Admin only | Manage system configuration key-value pairs |
 
 #### Shared Components
@@ -771,7 +771,7 @@ frontend/
   ├── /admin/bookings → AllBookings     (staffOnly)
   ├── /admin/sessions → AllSessions     (staffOnly)
   ├── /admin/issues   → AllIssues       (staffOnly)
-  ├── /admin/machines → MachineManagement (adminOnly)
+       ├── /admin/machines → MachineManagement (staffOnly)
   └── /admin/config   → SystemConfig     (adminOnly)
 
 /*                  → Redirect to /
