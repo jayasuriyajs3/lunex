@@ -102,8 +102,15 @@ const createBooking = asyncHandler(async (req, res) => {
     userId,
     NOTIFICATION_TYPES.BOOKING_CONFIRMED,
     'Booking Confirmed',
-    `Your slot on ${machine.name} is booked from ${bookingStart.toLocaleTimeString()} to ${bookingEnd.toLocaleTimeString()}.`,
-    { bookingId: booking._id, machineId: machine.machineId }
+    `Your slot on ${machine.name} has been booked.`,
+    {
+      bookingId: booking._id,
+      machineId: machine.machineId,
+      machineName: machine.name,
+      startTime: booking.startTime,
+      endTime: booking.endTime,
+      durationMinutes: booking.durationMinutes,
+    }
   );
 
   // Populate response
