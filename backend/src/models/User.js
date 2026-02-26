@@ -104,7 +104,7 @@ userSchema.index(
   {
     unique: true,
     partialFilterExpression: {
-      rfidUID: { $exists: true, $type: 'string', $ne: '' },
+      rfidUID: { $type: 'string' },
     },
   }
 );

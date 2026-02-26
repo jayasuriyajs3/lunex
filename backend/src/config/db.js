@@ -13,9 +13,7 @@ const ensureRfidIndex = async () => {
   const rfidIndex = indexes.find((index) => index.name === 'rfidUID_1');
 
   const hasExpectedPartialFilter =
-    rfidIndex?.partialFilterExpression?.rfidUID?.$exists === true &&
-    rfidIndex?.partialFilterExpression?.rfidUID?.$type === 'string' &&
-    rfidIndex?.partialFilterExpression?.rfidUID?.$ne === '';
+    rfidIndex?.partialFilterExpression?.rfidUID?.$type === 'string';
 
   if (rfidIndex && !hasExpectedPartialFilter) {
     await collection.dropIndex('rfidUID_1');
@@ -28,7 +26,7 @@ const ensureRfidIndex = async () => {
         name: 'rfidUID_1',
         unique: true,
         partialFilterExpression: {
-          rfidUID: { $exists: true, $type: 'string', $ne: '' },
+          rfidUID: { $type: 'string' },
         },
       }
     );
