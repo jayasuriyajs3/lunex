@@ -16,6 +16,45 @@ const {
 } = require('../config/constants');
 const { addMinutes, diffInMinutes } = require('../utils/dateHelpers');
 const { createNotification } = require('../services/notificationService');
+const { getNumericSystemConfig } = require('../services/systemConfigService');
+
+/**
+ * Job 0: Booking Start Reminder
+ * Runs every minute
+ *
+ * - Sends one reminder notification ~5 minutes before a confirmed booking starts
+ */
+const bookingStartReminderJob = () => {
+  cron.schedule('* * * * *', async () => {
+    try {
+      const now = new Date();
+      const reminderWindowEnd = addMinutes(now, 5);
+
+      const upcomingBookings = await Booking.find({
+        status: BOOKING_STATUS.CONFIRMED,
+        preStartReminderSentAt: null,
+        startTime: { $gt: now, $lte: reminderWindowEnd },
+      }).populate('machine', 'name');
+
+      for (const booking of upcomingBookings) {
+        const minutesLeft = Math.max(1, Math.ceil(diffInMinutes(now, booking.startTime)));
+
+        await createNotification(
+          booking.user,
+          NOTIFICATION_TYPES.ARRIVAL_REMINDER,
+          'Booking Starting Soon',
+          `Your booking on ${booking.machine?.name || 'the machine'} starts in ~${minutesLeft} minutes. Please arrive on time.`,
+          { bookingId: booking._id }
+        );
+
+        booking.preStartReminderSentAt = new Date();
+        await booking.save();
+      }
+    } catch (error) {
+      console.error('Booking start reminder job error:', error.message);
+    }
+  });
+};
 
 /**
  * Job 1: No-Show Detection & Auto-Cancellation
@@ -28,8 +67,21 @@ const noShowJob = () => {
   cron.schedule('* * * * *', async () => {
     try {
       const now = new Date();
-      const graceMinutes = parseInt(process.env.GRACE_PERIOD_MINUTES) || 10;
-      const reminderMinutes = parseInt(process.env.REMINDER_BEFORE_MINUTES) || 5;
+      const graceMinutes = await getNumericSystemConfig({
+        key: 'grace_period_minutes',
+        envKey: 'GRACE_PERIOD_MINUTES',
+        fallback: 10,
+        min: 1,
+      });
+      const reminderMinutes = Math.min(
+        graceMinutes,
+        await getNumericSystemConfig({
+          key: 'reminder_before_minutes',
+          envKey: 'REMINDER_BEFORE_MINUTES',
+          fallback: 5,
+          min: 1,
+        })
+      );
 
       // Find confirmed bookings where start time has passed
       const overdueBookings = await Booking.find({
@@ -164,6 +216,12 @@ const sessionEndingReminderJob = () => {
     try {
       const now = new Date();
       const fiveMinLater = addMinutes(now, 5);
+      const extensionMinutes = await getNumericSystemConfig({
+        key: 'extension_minutes',
+        envKey: 'EXTENSION_MINUTES',
+        fallback: 5,
+        min: 1,
+      });
 
       // Find running sessions ending in the next 5 minutes
       const endingSessions = await Session.find({
@@ -189,7 +247,7 @@ const sessionEndingReminderJob = () => {
             session.user,
             NOTIFICATION_TYPES.SESSION_ENDING,
             'Session Ending Soon',
-            `Your session on ${session.machine.name} will end in ~${remaining} minutes.${session.extensionGranted ? '' : ' You can extend by 5 minutes.'}`,
+            `Your session on ${session.machine.name} will end in ~${remaining} minutes.${session.extensionGranted ? '' : ` You can extend by ${extensionMinutes} minutes.`}`,
             { sessionId: session._id, canExtend: !session.extensionGranted }
           );
         }
@@ -253,6 +311,7 @@ const machineHeartbeatJob = () => {
  */
 const initCronJobs = () => {
   console.log('⏰ Starting cron jobs...');
+  bookingStartReminderJob();
   noShowJob();
   autoEndSessionJob();
   sessionEndingReminderJob();
