@@ -17,6 +17,7 @@ const {
 } = require('../config/constants');
 const { addMinutes, diffInMinutes } = require('../utils/dateHelpers');
 const { createNotification } = require('../services/notificationService');
+const { getNumericSystemConfig } = require('../services/systemConfigService');
 
 /**
  * @desc    Validate RFID scan from ESP32
@@ -139,7 +140,12 @@ const scanRFID = asyncHandler(async (req, res) => {
 
   // 6. Machine is available — check if user has a valid booking
   const now = new Date();
-  const graceMinutes = parseInt(process.env.GRACE_PERIOD_MINUTES) || 10;
+  const graceMinutes = await getNumericSystemConfig({
+    key: 'grace_period_minutes',
+    envKey: 'GRACE_PERIOD_MINUTES',
+    fallback: 10,
+    min: 1,
+  });
 
   // Find a confirmed booking for this user & machine within the grace window
   const booking = await Booking.findOne({

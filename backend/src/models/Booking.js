@@ -31,8 +31,7 @@ const bookingSchema = new mongoose.Schema(
     durationMinutes: {
       type: Number,
       required: true,
-      min: 10,
-      max: 60,
+      enum: [15, 30, 45, 60],
     },
     status: {
       type: String,
@@ -60,6 +59,10 @@ const bookingSchema = new mongoose.Schema(
       default: null,
     },
     reminderSentAt: {
+      type: Date,
+      default: null,
+    },
+    preStartReminderSentAt: {
       type: Date,
       default: null,
     },

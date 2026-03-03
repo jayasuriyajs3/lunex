@@ -16,7 +16,8 @@ const {
 } = require('../config/constants');
 const { addMinutes, diffInMinutes } = require('../utils/dateHelpers');
 const { createNotification } = require('../services/notificationService');
-const { isSlotAvailable } = require('../services/bookingService');
+const { isTimeRangeAvailable, getSlotBufferMinutes } = require('../services/bookingService');
+const { getNumericSystemConfig } = require('../services/systemConfigService');
 
 /**
  * @desc    Start a session (after RFID scan validates booking)
@@ -137,12 +138,20 @@ const extendSession = asyncHandler(async (req, res) => {
     throw new AppError('Extension already used for this session. Only one extension allowed.', 400);
   }
 
-  const extensionMinutes = parseInt(process.env.EXTENSION_MINUTES) || 5;
+  const slotBufferMinutes = await getSlotBufferMinutes();
+  const configuredExtension = await getNumericSystemConfig({
+    key: 'extension_minutes',
+    envKey: 'EXTENSION_MINUTES',
+    fallback: 5,
+    min: 1,
+  });
+  const extensionMinutes = Math.min(configuredExtension, slotBufferMinutes);
   const currentEnd = session.extendedEndAt || session.scheduledEndAt;
   const newEnd = addMinutes(currentEnd, extensionMinutes);
 
-  // Check if the extended time conflicts with next booking
-  const available = await isSlotAvailable(session.machine._id, currentEnd, newEnd, session.booking);
+  // Check if extension overlaps any other booking time range.
+  // This lets users consume their reserved slot buffer as extension.
+  const available = await isTimeRangeAvailable(session.machine._id, currentEnd, newEnd, session.booking);
   if (!available) {
     throw new AppError(
       'Cannot extend — the next slot is already booked. Extension would conflict.',

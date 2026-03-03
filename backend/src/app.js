@@ -35,7 +35,11 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // LOGGING
 // ============================================
 if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
+  app.use(
+    morgan('dev', {
+      skip: (req, res) => res.statusCode === 304,
+    })
+  );
 }
 
 // ============================================

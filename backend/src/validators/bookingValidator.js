@@ -11,9 +11,8 @@ const createBookingSchema = Joi.object({
     'date.format': 'Start time must be a valid ISO date',
     'any.required': 'Start time is required',
   }),
-  durationMinutes: Joi.number().integer().min(10).max(60).required().messages({
-    'number.min': 'Duration must be at least 10 minutes',
-    'number.max': 'Duration cannot exceed 60 minutes',
+  durationMinutes: Joi.number().integer().valid(15, 30, 45, 60).required().messages({
+    'any.only': 'Duration must be one of: 15, 30, 45, or 60 minutes',
     'any.required': 'Duration is required',
   }),
 });

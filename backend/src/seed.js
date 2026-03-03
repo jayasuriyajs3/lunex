@@ -117,7 +117,7 @@ const seedDB = async () => {
       {
         key: 'buffer_between_slots_minutes',
         value: 10,
-        description: 'Mandatory buffer between slots (5 min extension + 5 min rest)',
+        description: 'Mandatory 10-minute buffer between slots (user may use 5 minutes as extension, else full rest time)',
       },
       {
         key: 'extension_minutes',

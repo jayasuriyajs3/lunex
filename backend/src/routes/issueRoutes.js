@@ -24,10 +24,23 @@ const { ROLES } = require('../config/constants');
 router.use(protect);
 
 // User routes
-router.post('/', authorize(ROLES.USER), validate(reportIssueSchema), reportIssue);
-router.get('/my', authorize(ROLES.USER), getMyIssues);
-router.get('/priority-rebook/pending', authorize(ROLES.USER), getPendingPriorityRebooks);
-router.put('/priority-rebook/:id/respond', authorize(ROLES.USER), respondToPriorityRebook);
+router.post(
+  '/',
+  authorize(ROLES.USER, ROLES.WARDEN, ROLES.ADMIN),
+  validate(reportIssueSchema),
+  reportIssue
+);
+router.get('/my', authorize(ROLES.USER, ROLES.WARDEN, ROLES.ADMIN), getMyIssues);
+router.get(
+  '/priority-rebook/pending',
+  authorize(ROLES.USER, ROLES.WARDEN, ROLES.ADMIN),
+  getPendingPriorityRebooks
+);
+router.put(
+  '/priority-rebook/:id/respond',
+  authorize(ROLES.USER, ROLES.WARDEN, ROLES.ADMIN),
+  respondToPriorityRebook
+);
 
 // Warden + Admin routes
 router.get('/all', authorize(ROLES.WARDEN, ROLES.ADMIN), getAllIssues);

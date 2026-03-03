@@ -6,16 +6,23 @@ import { CalendarPlus, Clock, WashingMachine, ChevronLeft, ChevronRight } from '
 import { format, addDays, addMinutes as addMin, parseISO, startOfDay, isToday, isBefore, isAfter, isEqual } from 'date-fns';
 import toast from 'react-hot-toast';
 
-// Generate all possible 15-minute time slots for a given day (6 AM – 11 PM)
+// Generate all possible time slots for a given day (6 AM – 11 PM)
 function generateTimeSlots(dateStr, durationMinutes, occupiedBlocks, bufferMinutes) {
   const dayStart = parseISO(`${dateStr}T06:00:00`);
   const dayEnd = parseISO(`${dateStr}T23:00:00`);
   const now = new Date();
   const slots = [];
+  const effectiveBuffer = Number.isFinite(Number(bufferMinutes)) && Number(bufferMinutes) > 0
+    ? Number(bufferMinutes)
+    : 10;
+  const effectiveDuration = Number.isFinite(Number(durationMinutes)) && Number(durationMinutes) > 0
+    ? Number(durationMinutes)
+    : 15;
+  const stepMinutes = effectiveDuration + effectiveBuffer;
 
   let cursor = dayStart;
   while (isBefore(cursor, dayEnd)) {
-    const slotEnd = addMin(cursor, durationMinutes);
+    const slotEnd = addMin(cursor, effectiveDuration);
     // Don't show slots that end after closing
     if (isAfter(slotEnd, addMin(dayEnd, 1))) break;
     // Don't show past slots
@@ -31,7 +38,7 @@ function generateTimeSlots(dateStr, durationMinutes, occupiedBlocks, bufferMinut
       startTime: cursor.toISOString(),
       available: !isPast && !isOccupied,
     });
-    cursor = addMin(cursor, 15); // 15-minute intervals
+    cursor = addMin(cursor, stepMinutes);
   }
   return slots;
 }

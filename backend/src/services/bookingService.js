@@ -4,13 +4,21 @@
 const Booking = require('../models/Booking');
 const Machine = require('../models/Machine');
 const { BOOKING_STATUS, MACHINE_STATUS } = require('../config/constants');
-const { addMinutes, isOverlapping } = require('../utils/dateHelpers');
+const { addMinutes } = require('../utils/dateHelpers');
+const { getNumericSystemConfig } = require('./systemConfigService');
+
+const getSlotBufferMinutes = async () => getNumericSystemConfig({
+  key: 'buffer_between_slots_minutes',
+  envKey: 'BUFFER_BETWEEN_SLOTS_MINUTES',
+  fallback: 10,
+  min: 0,
+});
 
 /**
  * Check if a slot is available for a machine
  */
 const isSlotAvailable = async (machineId, startTime, endTime, excludeBookingId = null) => {
-  const bufferMinutes = parseInt(process.env.BUFFER_BETWEEN_SLOTS_MINUTES) || 10;
+  const bufferMinutes = await getSlotBufferMinutes();
 
   // Add buffer: the slot effectively occupies startTime to endTime + buffer
   const bufferedEnd = addMinutes(endTime, bufferMinutes);
@@ -26,6 +34,25 @@ const isSlotAvailable = async (machineId, startTime, endTime, excludeBookingId =
         endTime: { $gt: new Date(new Date(bufferedStart).getTime() - bufferMinutes * 60000) },
       },
     ],
+  };
+
+  if (excludeBookingId) {
+    query._id = { $ne: excludeBookingId };
+  }
+
+  const conflicting = await Booking.findOne(query);
+  return !conflicting;
+};
+
+/**
+ * Check if a raw time range (without extra slot buffer) is available for a machine
+ */
+const isTimeRangeAvailable = async (machineId, startTime, endTime, excludeBookingId = null) => {
+  const query = {
+    machine: machineId,
+    status: { $in: [BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.ACTIVE] },
+    startTime: { $lt: endTime },
+    endTime: { $gt: startTime },
   };
 
   if (excludeBookingId) {
@@ -56,7 +83,7 @@ const getUserBookingCountForDate = async (userId, date) => {
  * Find next available slot for a machine
  */
 const findNextAvailableSlot = async (machineId, durationMinutes, afterTime = new Date()) => {
-  const bufferMinutes = parseInt(process.env.BUFFER_BETWEEN_SLOTS_MINUTES) || 10;
+  const bufferMinutes = await getSlotBufferMinutes();
 
   // Get all upcoming confirmed/active bookings for this machine
   const bookings = await Booking.find({
@@ -94,7 +121,9 @@ const findNextAvailableSlot = async (machineId, durationMinutes, afterTime = new
 };
 
 module.exports = {
+  getSlotBufferMinutes,
   isSlotAvailable,
+  isTimeRangeAvailable,
   getUserBookingCountForDate,
   findNextAvailableSlot,
 };
